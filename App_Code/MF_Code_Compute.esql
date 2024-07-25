@@ -1,0 +1,561 @@
+
+
+CREATE COMPUTE MODULE MF_Code_Compute
+	
+
+	
+
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		
+			    --DECLARE Schema2 char 'mySchema2';
+                --CALL myProc1('HelloWorld') IN Database.{'Schema2'};
+--This statement calls the myProc1 procedure in database Schema2, overriding the default "username"schema.
+
+		 --CALL CopyMessageHeaders();
+		-- CALL CopyEntireMessage();
+		   --CALL SELECTDATA();
+		 --  CALL DYNAMICREF();
+		--CALL Arrayindex();
+		--CALL CREATEFIELDS() ;
+	      --CALL	propagate ();
+	    -- CALL ADDINTERVAL();
+	  -- CALL XMLREPEATED ();
+	 --   CALL functionsinesql();
+	    --call Environment(); 
+	    --CALL DATABASEOPEARTIONS ();
+	  --  CALL storedproced() ;
+	     	-- CALL SELECTfunction();
+	     --	CALL THEKEYWORDS();
+	     
+					--call exceptionme();
+	  call	throwexception ( );
+				
+				RETURN TRUE;
+
+		
+	
+			
+	
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		/*DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;*/
+			
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+	
+		CREATE PROCEDURE SELECTDATA() BEGIN
+			
+		
+		DECLARE CurrentCustomer CHARACTER 'Smith';
+		SET OutputRoot.XMLNSC.Invoice[] = (SELECT I FROM InputRoot.XMLNSC.Invoice[] AS I  WHERE I.Customer.LastName = CurrentCustomer);
+		/*This code writes all records from the input message to the output message if the WHERE condition
+(LastName = Smith) is met. All records that do not meet the condition are not copied from input message
+to output message.*/
+-- SET OutputRoot.XMLNSC.Invoice[] = (SELECT I, 'Customer' ||  I.Customer.lastName AS ExtraField from InputRoot.XMLNSC.Invoice[] AS I );
+		
+		--SET OutputRoot.XMLNSC.Invoice.Customer.Title = 'Mr'; 
+		--SET OutputRoot.XMLNSC.Invoice.Customer.Title VALUE = 'Mr'; 
+		SET OutputRoot.XMLNSC.Invoice.Customer.FirstName = UPPER(InputRoot.XMLNSC.Invoice.Customer.FirstName);
+		-- If you set the element to NULL by using the following statement, the element is deleted from the message tree:
+		
+		--SET OutputRoot.XMLNSC.Invoice.Customer.Title = NULL; 
+		--the element is not deleted from the message tree. Instead, a special value of NULL is assigned tothe element.
+		SET OutputRoot.XMLNSC.Invoice.Customer.Title VALUE = NULL; 
+		END;
+		
+		CREATE PROCEDURE DYNAMICREF() BEGIN
+			
+			
+				DECLARE CURSOR REFERENCE TO InputRoot.XMLNSC.Invoice.Purchases.Item[1];
+--LASTMOVE returns a Boolean value indicating whether the last MOVE function applied to source_dynamic_reference was successful (TRUE) or not (FALSE).
+               IF  LASTMOVE(CURSOR)=TRUE THEN
+				
+				SET  OutputRoot.XMLNSC.RESULT='ITEMS ARE PRESENT';
+				
+				
+               ELSE
+               	SET  OutputRoot.XMLNSC.RESULT='ITEMS NOT PRESENT';
+               END IF;
+               
+		END;
+		
+               	 CREATE PROCEDURE Arrayindex() BEGIN
+               	 	
+               	 	
+               	 	
+               	 	IF  InputRoot.XMLNSC.Invoice.Customer.Billing.Address[>]='Southampton' THEN
+               	 		
+               	 		-- [>] FOR first ELEMENT WE WILL USE THIS ARRAY INDEX
+               	 		
+               	 		SET OutputRoot.XMLNSC.Invoice.Customer.Billing.Address =' Address of the person';
+               	 		
+               	 	ELSEIF InputRoot.XMLNSC.Invoice.Customer.Billing.Address[<]='Hampshire' THEN
+               	 		
+               	 		-- [<] FOR LAST ELEMENT WE WILL USE THIS ARRAY INDEX
+               	 		
+               	 		SET OutputRoot.XMLNSC.Invoice.Customer.Billing.Address =' Second Address of the person';
+               	 		
+               	 	ELSEIF  InputRoot.XMLNSC.Invoice.Customer.Billing.Address[<2]='Southampton' THEN
+              
+               	 	-- [<2] FOR SECOND ELEMENT WE WILL USE THIS ARRAY INDEX
+                  SET OutputRoot.XMLNSC.Invoice.Customer.Billing.Address =' Third Address of the person';
+                  
+               	 	ELSE
+               	 	
+               	 	 SET OutputRoot.XMLNSC.Invoice.Customer.Billing.Address=' Address NOT FOUND';
+               	 	END IF;
+               	 END ;
+               	 	
+               	 	CREATE PROCEDURE CREATEFIELDS() BEGIN
+               	 		
+               	 		
+               	 		-- InputRoot.*[] is a path that identifies the array of all children of InputRoot.
+               	 		-- InputRoot.*[<]Refers to the last child of the root of the input message, that is, the body of the message.
+               	 		-- InputRoot.*[1]Refers to the first child of the root of the input message, the message properties.
+              
+               	 	
+               	 	CREATE FIELD         OutputRoot.XMLNSC.TestCase.description TYPE NameValue VALUE  ' This is my first Testcase';
+               	 	CREATE FIRSTCHILD OF OutputRoot.XMLNSC.TestCase DOMAIN ('XMLNSC') NAME 'IDENTIFIER' VALUE  InputRoot.XMLNSC.TestCase.Identifier;
+               	 	
+               	 	CREATE LASTCHILD OF OutputRoot.XMLNSC.TestCase Domain('XMLNSC') NAME 'Sport' VALUE InputRoot.XMLNS.TestCase.Sport;
+               	 	
+               	 	CREATE FIELD          OutputRoot.XMLNSC.TestCase.Division[1].Number TYPE NameValue VALUE 'Premiership';
+               	 	CREATE FIELD       OutputRoot.XMLNSC.TestCase.Division[1].Result[1].Number TYPE NameValue VALUE '1';
+               	 	
+                	CREATE FIELD        OutputRoot.XMLNSC.TestCase.Division[1].Result[1].Home TYPE Name;
+       	            CREATE LASTCHILD OF OutputRoot.XMLNSC.TestCase.Division[1].Result[1].Home NAME 'Team' VALUE 'Liverpool' ;
+                    CREATE LASTCHILD OF OutputRoot.XMLNSC.TestCase.Division[1].Result[1].Home NAME 'Score' VALUE '4';
+           	     
+           	       CREATE FIELD        OutputRoot.XMLNSC.TestCase.Division[1].Result[1].Away TYPE Name;
+           		   CREATE LASTCHILD OF OutputRoot.XMLNSC.TestCase.Division[1].Result[1].Away NAME 'Team' VALUE 'Everton';
+           		   CREATE LASTCHILD OF OutputRoot.XMLNSC.TestCase.Division[1].Result[1].Away NAME 'Score' VALUE '0';
+               	 END ;
+               	 
+               	 CREATE PROCEDURE propagate ( )
+               	 BEGIN
+               	 	
+               	 	  SET OutputRoot = InputRoot;
+               	 	  -- Default Out is MQ ,out1 is http reply and out2  is file it is working accurately.
+                      PROPAGATE TO TERMINAL 'out1' DELETE NONE;
+				      PROPAGATE TO TERMINAL 'out2' DELETE NONE;
+               	 END;
+               	 
+               	 CREATE PROCEDURE ADDINTERVAL() BEGIN
+               	 	
+               	 	
+               	 /*	DECLARE RetAge CHARACTER '65';
+               	 	DECLARE BirthDate DATE DATE '1997-11-22';
+               	 	SET OutputRoot.XMLNSC.Test.RetirnmentDate = BirthDate + CAST (RetAge AS INTERVAL YEAR); 
+               	 	
+					
+					
+					DECLARE MonthsInterval INTERVAL ;
+               	 	DECLARE HourInterval INTERVAL;
+               	 	DECLARE MinutesInterval1 INTERVAL;
+               	 	DECLARE MinutesIntervaLToSec INTERVAL;
+               	 	
+               	 	DECLARE MonthsString CHARACTER;
+               	 	DECLARE Hourstring CHARACTER;
+               	 	DECLARE Minutestring CHARACTER;
+               	 	DECLARE minutetosec CHARACTER;
+					
+					SET MonthsInterval = INTERVAL '1-06' YEAR TO MONTH + INTERVAL '1-06' YEAR TO MONTH;
+					SET HourInterval  = INTERVAL '2 01'  DAY TO HOUR + INTERVAL '2 01'  DAY TO HOUR ;
+					SET MinutesInterval1 = INTERVAL '2 01' DAY TO HOUR + INTERVAL '123:59' MINUTE TO SECOND;
+					SET  MinutesIntervaLToSec = INTERVAL '60:59' MINUTE TO SECOND + INTERVAL '60:59' MINUTE TO SECOND;
+					
+					
+					SET MonthsString = CAST(MonthsInterval AS CHARACTER);
+					SET Hourstring = CAST(HourInterval AS CHARACTER);
+					SET Minutestring = CAST(MinutesInterval1 AS CHARACTER);
+					SET minutetosec = CAST(MinutesIntervaLToSec AS CHARACTER);
+					
+					SET OutputRoot.XMLNSC.Test.Months = MonthsString;
+					SET OutputRoot.XMLNSC.Test.HOUR  =   Hourstring;
+					SET OutputRoot.XMLNSC.Test.Minutes = Minutestring;
+					  SET OutputRoot.XMLNSC.Test.Minutes = minutetosec; 
+					
+					DECLARE totaldays CHARACTER ;
+					DECLARE totalSeconds CHARACTER;
+					
+					SET totaldays = (CURRENT_DATE - DATE '2024-07-08') DAY ;
+					SET OutputRoot.XMLNSC.Test.DAYS = totaldays; -- RETURNS HOW MANY DAYS;
+					SET  totalSeconds = (CURRENT_TIME - TIME '00:00:00')MINUTE TO SECOND; 
+					SET OutputRoot.XMLNSC.Test.TIME = totalSeconds; -- RETURNS HOW MANY MINUTES UPTO NOW */
+					
+					Declare PutTime INTERVAL;
+                    SET PutTime = (CURRENT_GMTTIME - InputRoot.HTTPInputHeader.PUTTIME) MINUTE TO SECOND;
+                    SET OutputRoot.XMLNSC.Test.PutTime = PutTime;
+               	 END;
+               	 CREATE PROCEDURE XMLREPEATED ( )  	 BEGIN
+               	 	/*Request
+               	 	<Field_top>
+	    			<field1>sHUBHAM</field1>
+	 			    <field1>PRAFULL</field1>
+	    			<field1>BAI</field1>
+	   			 	<field1>PAPA</field1>
+ 	   				<field1>MUMMY</field1>
+					</Field_top>*/
+               	 
+               	 DECLARE I INTEGER ;
+               	 DECLARE J INTEGER;
+               	 SET I =1 ;
+               	 SET J = CARDINALITY (InputRoot.XMLNSC.Field_top.field1[]);
+               	 WHILE I <= J DO 
+               	 	
+               	 	SET OutputRoot.XMLNSC.Field_top.OutField[I] = InputRoot.XMLNSC.Field_top.field1[I];
+               	 	SET I =I+1;
+               	 END WHILE;
+               	 END;
+               	 
+               	 CREATE PROCEDURE functionsinesql ()
+               	 BEGIN
+               	/*	 Request
+               	 <root id="12345">
+                 <id>ABCDE</id>
+                 </root>*/
+                  DECLARE value2,value1 character;
+                  
+                 SET value2 = FIELDVALUE(InputRoot.XMLNSC.root.(XMLNSC.Field)id) ;
+                 SET value1 = FIELDVALUE(InputRoot.XMLNSC.root.(XMLNSC.Attribute)id);
+                
+                 CREATE LASTCHILD OF OutputRoot.XMLNSC Type XMLNSC.Folder Name 'root'; 
+-- Note : XMLNSC.Attribute could be used here as well. 
+               SET OutputRoot.XMLNSC.root.(XMLNSC.Attribute)id = '12345'; 
+                SET OutputRoot.XMLNSC.root.(XMLNSC.Field)id = 'ABCDE';
+               	 
+              	 IF  CAST (InputRoot.XMLNSC.Invoice.InvoiceDate AS DATE) = CURRENT_DATE THEN 
+               	 	
+               	 	SET OutputRoot.XMLNSC.Invoice.InvoiceDate='Date is correct';
+               	 	
+               	 else 
+               	 	
+               	 	SET OutputRoot.XMLNSC.Invoice.InvoiceDate='Date not is correct';
+               	 END IF ;
+               	 	
+               	 END;
+               	 
+               	 CREATE PROCEDURE  Environment() 
+               	 BEGIN
+               	 	
+               	 	SET Environment.Variables = ROW ('granary' AS bread, 'reisling' AS wine, 'stilton' AS cheese);
+               	 	SET Environment.Variables.Colors[] = LIST{'yellow', 'green', 'blue', 'red', 'black'};
+               	 	SET Environment.Variables.Country[] = LIST{ROW('UK' AS name, 'pound' AS currency),ROW('USA' AS name, 'dollar' AS currency)};
+               	 	
+               	 	DECLARE I INTEGER 1;
+                    DECLARE C CHARACTER;
+                  -- The following statement generates an error
+                  -- SET C = I;
+                  -- The following statement is valid
+                   SET C = CAST(I AS CHARACTER);
+               	 	
+               	 END;
+               	 
+               	 
+               	 CREATE PROCEDURE DATABASEOPEARTIONS ()
+               	 BEGIN
+               	 	/*DECLARE INref REFERENCE to InputRoot.XMLNSC.student;
+               	 	DECLARE ID INTEGER ;
+               	 	SET ID =  INref.ID;          	 	
+               	 	DECLARE QUERY ROW;
+               	 	SET QUERY = 'select * from student where ID =? ';
+                     
+               	 	SET OutputRoot.XML.Test.Result[] =  PASSTHRU (QUERY VALUES (ID));*/
+               	 	DECLARE Inref REFERENCE TO InputRoot.XMLNSC.TestCase;
+               	 	DECLARE STOCK_ID INTEGER;
+               	 	
+               	 	-------------------------------------------------------------------------------------------------
+               	 	IF Inref.Action = 'Insert' THEN
+               	 		
+ INSERT INTO Database.system.STOCK (STOCK_ID,STOCK_DESC,STOCK_QTY_HELD,BROKER_BUY_PRICE,BROKER_SELL_PRICE,STOCK_HIGH_PRICE,STOCK_HIGH_DATE,STOCK_HIGH_TIME)
+ VALUES 
+              (CAST(InputRoot.XMLNSC.TestCase.stock_id AS INTEGER),
+              InputRoot.XMLNSC.TestCase.stock_desc,
+              CAST(InputRoot.XMLNSC.TestCase.stock_qty_held AS DECIMAL(10, 2)),
+              CAST(InputRoot.XMLNSC.TestCase.broker_buy_price AS DECIMAL(10, 2)),
+              CAST(InputRoot.XMLNSC.TestCase.broker_sell_price AS DECIMAL(10, 2)),
+			  InputRoot.XMLNSC.TestCase.stock_high_price,CURRENT_DATE,CURRENT_TIME); 
+					 
+               	 	ELSEIF Inref.Action = 'DELETE' THEN
+               	 		
+               	 	
+               	 		DELETE FROM Database.system.STOCK AS b where b.STOCK_ID = CAST (InputRoot.XMLNSC.TestCase.stock_id AS INTEGER);
+               	 		
+               	 		
+               	 	ELSEIF Inref.Action= 'UPDATE' THEN
+               	 		
+               	 		-- DECLARE eid INTEGER;
+					  --  DECLARE eplace CHARACTER;
+					  --  DECLARE STUDENT CHARACTER;
+					  --  SET eid = InRef.ID;
+					  --  SET eplace = InRef.PLACE;
+					
+					  --  UPDATE Database.STUDENT AS stu SET PLACE = eplace WHERE stu.ID = eid;
+               	 		DECLARE STOCK_ID INTEGER;
+               	 		DECLARE OLDSTOCK_ID INTEGER;
+               	 		DECLARE BROKER_BUY_PRICE DECIMAL;
+               	 		DECLARE newBROKER_BUY_PRICE DECIMAL;
+               	 		set OLDSTOCK_ID =  CAST (Inref.stock_id AS INTEGER);
+               	 		DECLARE updatenew DECIMAL; 
+               	 		set newBROKER_BUY_PRICE = cast (Inref.broker_buy_price AS DECIMAL(10, 2)) ;
+               	 		--DECLARE updaten ROW;
+               	 		UPDATE Database.STOCK AS stu SET BROKER_BUY_PRICE = newBROKER_BUY_PRICE WHERE stu.STOCK_ID = OLDSTOCK_ID;
+            --   	 SET updaten =	 'UPDATE Database.system.STOCK AS STOCK SET BROKER_BUY_PRICE = ' || CAST(updatenew AS CHARACTER) || ' WHERE STOCK_ID = ' || CAST(OLDSTOCK_ID AS CHARACTER);
+              -- 	 SET updaten =	 'UPDATE Database.system.STOCK AS STOCK SET BROKER_BUY_PRICE = updatenew  WHERE STOCK_ID = OLDSTOCK_ID ';
+               	 
+               	  
+               	 
+               	 		--SET OutputRoot.XMLNSC.TestCase.data= PASSTHRU (updaten VALUES (OLDSTOCK_ID));
+               	 		if SQLCODE=0 then
+               	 		SET OutputRoot.XMLNSC.TestCase.Result='Data updated succesfully';
+               	 		elseif SQLCODE=1 then
+               	 	    SET OutputRoot.XMLNSC.TestCase.Result='not updated succesfully';
+               	 			
+               	 		end if ;
+               	 	END IF;
+               	 	
+           
+              
+              
+               	 	END;   
+               	 	
+               	 	   CREATE PROCEDURE storedproced() BEGIN
+               	 	   
+               	 	   	DECLARE Inref REFERENCE TO InputRoot.XMLNSC.Student;
+               	 	  
+               	 	   	 
+               	 	   SET OutputRoot.JSON.Data.Student.Name = Inref.NAME;
+	                   SET OutputRoot.JSON.Data.Student.Id = Inref.ID;
+	                   SET OutputRoot.JSON.Data.Student.Place = Inref.PLACE;
+--		
+               	 	   	 
+               	 	   
+               	 	   	DECLARE ESBRequest,ESBResponse,appname,msgflow_name CHARACTER;
+               	 	   	DECLARE BLOBDATAESBREQUST,BLOBDATAESBRESPONSE BLOB;
+               	 	   	SET appname = ApplicationLabel;
+               	 	   	SET msgflow_name=  MessageFlowLabel;
+               	 	   DECLARE REQ_TIME CHARACTER; 
+               	 	   SET REQ_TIME = CAST(CURRENT_TIMESTAMP  as CHARACTER);
+               	 	   	               	 	   	
+               	 	   	SET BLOBDATAESBREQUST = ASBITSTREAM (InputRoot.XMLNSC ENCODING 546 CCSID 1208);
+               	 	   	SET BLOBDATAESBRESPONSE = ASBITSTREAM (OutputRoot.JSON.Data ENCODING 546 CCSID 1208);
+               	 	   	
+               	 	   	
+               	 	   	SET ESBRequest = CAST ( BLOBDATAESBREQUST AS CHARACTER CCSID 1208);
+               	 	   	SET ESBResponse = CAST ( BLOBDATAESBRESPONSE AS CHARACTER CCSID 1208);
+               	 	 
+               	 	   	
+               	 --	CALL ESBLOG  (appname,msgflow_name,ESBRequest,REQ_TIME,ESBResponse);
+
+               	 	  END; 
+               	 	  
+               	 	  CREATE PROCEDURE SELECTfunction()
+               	 	  BEGIN
+ /*SET OutputRoot.XMLNSC.Data.Output[] =(SELECT R.Quantity, R.Author FROM InputRoot.XMLNSC.Invoice.Purchases.Item[] AS R);
+SET OutputRoot.XMLNSC.Data.Output[] = (SELECT R.Quantity AS Book.Quantity, R.Author AS Book.Author FROM InputRoot.XMLNSC.Invoice.Purchases.Item[] AS R);
+SET OutputRoot.XMLNSC.Data.Output[] =
+(SELECT 'Start' AS Header,'Number of books:' || R.Quantity AS Book.Quantity, R.Author || ':Name and Surname' AS Book.Author,
+ 'End' AS Trailer FROM InputRoot.XMLNSC.Invoice.Purchases.Item[] AS R);  
+ 
+ 
+ 
+ SET OutputRoot.XMLNSC.Data.Output[] =
+ (SELECT R.Quantity.* AS Book.(XMLNSC.Attribute)Quantity,R.Author.* AS Book.(XMLNSC.Attribute)Author FROM InputRoot.XMLNSC.Invoice.Purchases.Item[] AS R);*/
+              	 	  	
+     SET OutputRoot.XMLNSC.Data.Statement[] =
+ (SELECT I.Customer.Title AS Customer.Title, I.Customer.FirstName || ' ' || I.Customer.LastName AS Customer.Name,COALESCE(I.Customer.PhoneHome,'') AS Customer.Phone,
+ (SELECT II.Title AS Desc,CAST(II.UnitPrice AS FLOAT) * 1.6 AS Cost,II.Quantity AS Qty FROM I.Purchases.Item[] AS II
+ WHERE II.UnitPrice> 0.0 ) AS Purchases.Article[], (SELECT SUM( CAST(II.UnitPrice AS FLOAT) * CAST(II.Quantity AS FLOAT) * 1.6 )
+ FROM I.Purchases.Item[] AS II ) AS Amount, 'Dollars' AS Amount.(XMLNSC.Attribute)Currency FROM InputRoot.XMLNSC.Invoice[] AS I
+ WHERE I.Customer.LastName <> 'Brown' );
+     
+               	 	  	
+               	 	  END;
+               	 	  
+               	 	  CREATE PROCEDURE THEKEYWORDS ( )
+               	 	  BEGIN
+               	 	  	
+ SET OutputRoot.XMLNSC.Test.Result =THE (SELECT T.Publisher, T.Author FROM InputRoot.XMLNSC.Invoice.Purchases.Item[] AS T WHERE T.UnitPrice = 42.95);
+ -- The THE keyword means that the target of the assignment becomes OutputRoot.XMLNS.Test.Result(the "[]" is not permitted). Its use generates the following output message:
+               	 	  	
+               	 	  	
+               	 	  END;
+               	 	  
+               	 	  create PROCEDURE  exceptionme()
+			BEGIN
+			DECLARE Inref REFERENCE to InputRoot.XMLNSC.Student;	
+			DECLARE SQLState1 CHARACTER;
+			DECLARE SQLErrorText1 CHARACTER;
+			DECLARE SQLCode1 INTEGER;
+			DECLARE SQLNativeError1 INTEGER;
+			DECLARE id INTEGER;
+			DECLARE Name CHARACTER;
+			DECLARE place CHARACTER;
+			set id = Inref.ID;
+			set Name = Inref.NAME;
+			set place = Inref.PLACE;
+				-- Make a database insert to a table that does not exist --
+	INSERT INTO Database.system.student (ID,NAME,PLACE) VALUES (id,Name,place);
+			--Retrieve the database return codes --
+				SET SQLState1 = SQLSTATE;
+				SET SQLCode1 = SQLCODE;
+				SET SQLErrorText1 = SQLERRORTEXT;
+		    	SET SQLNativeError1 = SQLNATIVEERROR;
+			 IF SQLCODE=0 THEN
+			 SET OutputRoot.XMLNSC.RESULT='SUCCES IN DBA';
+			 --THROW USER EXCEPTION MESSAGE 2950 VALUES( 'The SQL State' , SQLState1 , SQLCode1 , SQLNativeError1 ,SQLErrorText1 );
+			 ELSEif  SQLCODE=1 then
+			 	SET OutputRoot.XMLNSC.RESULT='failure IN DBA';
+			 END IF;
+		
+			END;
+			
+			
+				create PROCEDURE throwexception ( )
+		BEGIN
+			--Check for invoice number lower than permitted range
+			IF InputRoot.XMLNSC.Invoice.InvoiceNo < 100000 THEN
+			   THROW USER EXCEPTION CATALOG 'MyCatalog' MESSAGE 1234 VALUES
+			   ('Invoice number too low', InputRoot.XMLNSC.Invoice.InvoiceNo);
+			
+			-- Check for invoice number higher than permitted range
+			ELSEIF InputRoot.XMLNSC.Invoice.InvoiceNo  > 500000 THEN
+			      THROW USER EXCEPTION CATALOG 'MyCatalog' MESSAGE 1235 VALUES
+			   ('Invoice number too high', InputRoot.XMLNSC.Invoice.InvoiceNo);
+			
+			ELSE 
+				SET OutputRoot= InputRoot;
+			  -- invoice number is within permitted range
+			  -- complete normal processing
+			 
+			END if ;
+			
+		END;
+               	 	  
+               	 	/*  CREATE PROCEDURE ESBLOG (IN appname CHARACTER,IN msgflow_name CHARACTER,IN ESBRequest CHARACTER,IN REQ_TIME CHARACTER,IN ESBResponse CHARACTER)
+               	 	  LANGUAGE DATABASE
+               	 	  EXTERNAL NAME "ESBLOGDETAILS";     */ 	 
+               	
+END MODULE;
+
+
+CREATE COMPUTE MODULE Namespace
+	
+	CREATE FUNCTION Main () RETURNS BOOLEAN
+	BEGIN
+		
+		--call namsespace();
+		--call xmldeclration ( );
+	      --  call   Entitydefinition ( );
+	     call   samples ( );
+		
+		
+		RETURN TRUE;
+	END; 
+	
+	CREATE PROCEDURE namsespace( )
+	BEGIN
+		
+		-- Declaration of namespace constants --
+			--These are only used by ESQL
+			DECLARE sp1 NAMESPACE 'http://www.ibm.com/space1';
+			DECLARE sp2 NAMESPACE 'http://www.ibm.com/space2';
+			DECLARE sp3 NAMESPACE 'http://www.ibm.com/space3';
+			-- Namespace declaration for prefix 'space1'
+			SET OutputRoot.XMLNSC.message.(XMLNSC.NamespaceDecl)xmlns:space1 = 'http://www.ibm.com/space1';
+			SET OutputRoot.XMLNSC.message.sp1:data1 = 'Hello!';
+			-- Default namespace declaration ( empty prefix )
+			SET OutputRoot.XMLNSC.message.sp2:data2.(XMLNSC.NamespaceDecl)xmlns = 'http://www.ibm.com/space2';
+			SET OutputRoot.XMLNSC.message.sp2:data2.sp2:subData1 = 'Hola!';
+			SET OutputRoot.XMLNSC.message.sp2:data2.sp2:subData2 = 'Guten Tag!';
+			SET OutputRoot.XMLNSC.message.sp3:data3 = 'Bonjour!';
+			
+	END;
+	 CREATE PROCEDURE xmldeclration ( )
+	 BEGIN
+	 	
+	 	/*<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+          <!DOCTYPE s1 PUBLIC "http://www.ibm.com/example.dtd" "example.dtd">
+           <s1>........</s1>*/
+	 	CREATE FIRSTCHILD OF OutputRoot.XMLNSC TYPE XMLNSC.XmlDeclaration NAME 'XmlDeclaration';
+        SET OutputRoot.XMLNSC.(XMLNSC.XmlDeclaration)*.(XMLNSC.Attribute)Version = '1.0';
+        SET OutputRoot.XMLNSC.(XMLNSC.XmlDeclaration)*.(XMLNSC.Attribute)Encoding = 'UTF-8';
+         SET OutputRoot.XMLNSC.(XMLNSC.XmlDeclaration)*.(XMLNSC.Attribute)StandAlone = 'yes'; 
+	 END;
+	 
+	 CREATE PROCEDURE Entitydefinition ( )
+	 BEGIN
+	 	
+	 	/*request <BookInfo dtn="BookInfo" edn="author" edv="A.N.Other"/> */
+	 	
+	 	DECLARE cursor REFERENCE TO InputRoot.XMLNSC.BookInfo;
+		DECLARE docTypeName CHARACTER cursor.dtn;
+		DECLARE authorRef CHARACTER 'author';
+		-- Create <!DOCTYPE BOOKInfo …
+		SET OutputRoot.XMLNSC.(XMLNSC.DocumentType)* NAME = docTypeName;
+		-- Create <!ENTITY author "A.N.Other" > …
+		SET OutputRoot.XMLNSC.(XMLNSC.DocumentType){docTypeName}.(XMLNSC.EntityDefinition) {authorRef} =
+		cursor.edv;
+		-- Create the entity reference
+		SET OutputRoot.XMLNSC.(XMLNSC.Folder){docTypeName}.(XMLNSC.EntityReference)entref = authorRef; 
+	 END;
+			
+			
+			create PROCEDURE samples ( )
+			BEGIN
+				
+			/*	<root id="12345">
+                 <id>ABCDE</id>
+                </root>
+				*/
+				
+				-- >>  Field Declration.
+				SET OutputRoot.XMLNSC.root.(XMLNSC.Field)id = 'ABCDE';
+				-- >> Attribute Declration.
+				SET OutputRoot.XMLNSC.root.(XMLNSC.Attribute)id = '12345';
+				
+				
+			    -- >>	Declaring a non-empty prefix
+				DECLARE space1 NAMESPACE 'namespace1';
+                SET OutputRoot.XMLNSC.space1:root.(XMLNSC.NamespaceDecl)xmlns:ns1 = space1;
+                SET OutputRoot.XMLNSC.space1:root.space1:example = 'ABCD';
+				--Response
+	/*			<ns1:root xmlns:ns1="namespace1">
+                <ns1:example>ABCDE</ns1:example>
+                </ns1:root>  */
+                
+                -- >> Declaring an empty prefix
+                
+              --  DECLARE space1 NAMESPACE 'namespace1';
+                SET OutputRoot.XMLNSC.space1:root.(XMLNSC.NamespaceDecl)xmlns = space1;
+                SET OutputRoot.XMLNSC.space1:root.space1:example = 'ABCDE';
+                
+				--response
+	/*			<root xmlns="namespace1">
+                <example>ABCDE</example>
+                </root>  */
+				
+				-- >> : Adding a namespace declaration with a prefix
+				
+				SET OutputRoot.(XMLNSC.DoubleNamespaceDecl)xmlns:ns2 = space1;
+				
+			END;
+	
+END MODULE;
+
+
+
+
+
+	
