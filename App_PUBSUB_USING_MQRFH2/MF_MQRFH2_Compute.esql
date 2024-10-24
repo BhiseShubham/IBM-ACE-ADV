@@ -1,0 +1,39 @@
+
+
+
+
+CREATE COMPUTE MODULE MF_MQRFH2_Compute
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		-- CALL CopyMessageHeaders();
+		 CALL CopyEntireMessage();
+
+--		SET OutputRoot.MQRFH2.(MQRFH2.Field)Version = 2;
+--		SET OutputRoot.MQRFH2.(MQRFH2.Field)Format = 'MQSTR';
+--		SET OutputRoot.MQRFH2.(MQRFH2.Field)NameValueCCSID = 1208;
+--		SET OutputRoot.MQRFH2.psc.Command = 'Publish';
+--		SET OutputRoot.MQRFH2.psc.Topic = 'topic1';
+--		SET OutputRoot.MQRFH2.psc.QMgrName = 'QMGR';
+--		SET OutputRoot.MQRFH2.psc.QName = 'FIRSTSUB';
+--		SET OutputRoot.MQRFH2.psc.RegOpt = 'PersAsPub';
+		RETURN TRUE;
+	END;
+
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot.MQRFH2.Version = 2;
+
+        SET OutputRoot.MQRFH2.Format = MQFMT_NONE;
+
+        SET OutputRoot.MQRFH2.NameValueCCSID = 1208;
+        
+
+		SET OutputRoot.MQRFH2.psc.Command = 'Publish';
+
+		SET OutputRoot.MQRFH2.psc.Topic = 'topic1/topic1';
+
+		SET OutputRoot.MQRFH2.psc.PubOpt = 'Local';
+		
+		SET OutputRoot.JSON.Data.Employee = InputRoot.XMLNSC.Employee;
+	END;
+END MODULE;
