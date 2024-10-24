@@ -1,0 +1,196 @@
+
+
+
+
+
+
+BROKER SCHEMA com.getpayload
+
+PATH Com.common.esql;
+CREATE COMPUTE MODULE Mf_getpayload_Compute
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		-- CALL CopyMessageHeaders();
+		CALL CopyEntireMessage();
+		RETURN TRUE;
+	END;
+
+
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+
+
+		DECLARE inRef REFERENCE TO InputRoot;
+		DECLARE ccidRef INTEGER InputRoot.Properties.CodedCharSetId;
+		DECLARE encodeRef INTEGER InputRoot.Properties.Encoding;
+		DECLARE domainDataRef REFERENCE TO InputBody;
+		DECLARE domainName CHARACTER FIELDNAME(InputBody);
+		DECLARE getPayLoad CHARACTER;
+		DECLARE procCodeData CHARACTER;
+		DECLARE channel CHARACTER;
+		DECLARE serviceName CHARACTER;
+		DECLARE ErrorCode CHARACTER;
+		DECLARE ns1 CHARACTER '';
+		DECLARE soapenv CHARACTER '';
+		SET Environment.Variables.reqMsg = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
+		SET Environment.MQRFH2.RequestIdentifier = SUBSTRING(CAST (InputLocalEnvironment.Destination.HTTP.RequestIdentifier AS CHAR) FROM 3 FOR 48);
+		SET Environment.MQRFH2.usr.HTTPInputHeader = InputRoot.HTTPInputHeader;
+
+
+		IF STARTSWITH(Environment.Variables.reqMsg,'{') THEN
+			SET Environment.MQRFH2.RequestDomian = 'JSON';
+			CREATE LASTCHILD OF OutputRoot DOMAIN ('JSON') PARSE (InputRoot.BLOB.BLOB);
+			MOVE inRef TO OutputRoot.JSON.Data;
+		ELSEIF STARTSWITH(Environment.Variables.reqMsg,'<s:') OR STARTSWITH(Environment.Variables.reqMsg,'<so') THEN
+			SET Environment.MQRFH2.RequestDomian = 'SOAP';
+			CREATE LASTCHILD OF OutputRoot DOMAIN ('XMLNSC') PARSE (InputRoot.BLOB.BLOB);
+		ELSEIF STARTSWITH(Environment.Variables.reqMsg,'<') THEN
+			SET Environment.MQRFH2.RequestDomian = 'XMLNSC';
+			CREATE LASTCHILD OF OutputRoot DOMAIN ('XMLNSC') PARSE (InputRoot.BLOB.BLOB);
+			MOVE inRef TO Environment.XMLNSC.request;
+		ELSE
+			SET Environment.MQRFH2.RequestDomian = 'Unknown';
+		END IF;
+
+		IF Environment.MQRFH2.RequestDomian IS NOT NULL AND FIELDVALUE(Environment.MQRFH2.RequestDomian) <> 'Unknown' THEN
+
+			IF Environment.MQRFH2.RequestDomian <> 'SOAP' THEN
+				IF (LENGTH (inRef.processingCode) > 0 AND NOT CONTAINS (inRef.processingCode,' ')) OR
+					(LENGTH(inRef.*.processingCode) > 0 AND NOT CONTAINS(inRef.*.header.processingCode,' ')) OR
+					(LENGTH(inRef.header.processingCode) > 0 AND NOT CONTAINS (inRef.header.processingCode,' ')) THEN
+
+					SET Environment.Variables.processingCode = COALESCE(inRef.processingCode,inRef.*.header.processingCode,inRef.header.processingCode,'');
+					SET Environment.MQRFH2.usr.sbPcode = Environment.Variables.processingCode;
+
+				ELSE
+					-- CALL errorResponse(Environment.MQRFH2.RequestDomian,'key [processingCode] should not contain spaces','ESB_006',serviceName);
+
+				END IF;
+
+				IF LENGTH (inRef.channel) > 0 OR LENGTH (inRef.*.channel) >0 OR LENGTH (inRef.header.channel) > 0 THEN
+					SET Environment.Variables.channel = COALESCE (inRef.channel,inRef.*.channel,inRef.header.channel,' ');
+				END IF;
+
+				IF (FIELDNAME(Environment.Variables.processingCode) IS NULL) AND (FIELDNAME(Environment.Variables.channel) IS NULL) THEN
+					-- CALL errorResponse(Environment.MQRFH2.RequestDomian,'no key [processing code & Channel] in the request','ESB_007',serviceName);
+
+				ELSE IF (FIELDVALUE(Environment.Variables.processingCode) = ' ' AND FIELDVALUE (Environment.Variables.channel) = ' ') THEN                   
+
+
+				ELSE IF FIELDNAME(Environment.Variables.channel) IS NULL THEN
+
+
+				ELSE IF FIELDVALUE(Environment.Variables.channel) IS NULL THEN
+
+				ELSE IF FIELDNAME(Environment.Variables.processingCode) IS NULL THEN
+
+				ELSE IF FIELDVALUE(Environment.Variables.processingCode) IS NULL THEN
+
+				ELSE IF NOT LENGTH (FIELDVALUE(Environment.Variables.processingCode)) = 6 THEN
+
+
+				ELSE
+
+					SET procCodeData = SUBSTRING(Environment.Variables.processingCode FROM 1 FOR 2);
+					SET channel = Environment.Variables.channel;				    
+				
+
+
+
+
+				END IF;
+
+			ELSE IF FIELDNAME(Environment.MQRFHT2.serviceName) IS NULL THEN
+			END IF;
+		END IF;
+	END IF;
+END IF;
+END IF;
+END IF;
+END IF;
+END IF;
+
+END IF;
+END;
+
+CREATE PROCEDURE errorResponse(IN domainName CHAR , IN errorCode CHAR, IN msg CHAR, IN serviceName CHAR ) BEGIN
+
+
+	DECLARE outRefer REFERENCE TO OutputRoot;
+
+	IF domainName = 'JSON' THEN
+
+		SET Environment.JSON = NULL;
+
+		CREATE LASTCHILD OF Environment DOMAIN ('JSON');
+		CREATE LASTCHILD OF Environment.JSON NAME 'Data';
+		CREATE LASTCHILD OF Environment.JSON.Data NAME REPLACE(serviceName,'Request','Response');
+		CREATE LASTCHILD OF Environment.JSON.Data.* NAME 'header';
+		CREATE LASTCHILD OF Environment.JSON.Data.* NAME 'error';
+
+		DECLARE headRef REFERENCE TO Environment.JSON.Data.*.header;
+		DECLARE errorRef REFERENCE TO Environment.JSON.Data.*.error;
+
+		SET headRef = Environment.MQRFHT2.header;
+		SET headRef.Staus = 'FAILED';
+		SET headRef.responseCode = '000';
+		SET errorRef.source = 'ESB';
+		SET errorRef.applicationName = ApplicationLabel;
+		SET errorRef.applicationErrorCode = errorCode;
+		SET errorRef.message = msg;
+		DECLARE domainDataRef REFERENCE TO Environment.JSON;
+
+		SET Environment.Variables.resMsg = getPayLoad(domainName,domainDataRef,InputRoot.Properties.Encoding,InputRoot.Properties.CodedCharSetId);
+		PROPAGATE TO TERMINAL 'out';
+
+		SET OutputRoot.Properties = InputRoot.Properties;
+		SET OutputRoot.JSON = Environment.JSON;
+
+	ELSE IF domainName = 'SOAP' THEN
+		SET Environment.XMLNSC = NULL;
+		SET Environment.XMLNSC.soapenv:Envelope.(XMLNSC.NamespaceDecl)xmlns:ns1 = ns1;
+		--SET Environment.XMLNSC.soapenv:Envelope(XMLNSC.NamespaceDecl)xmlns:soapenv = soapenv;
+		SET Environment.XMLNSC.soapenv:Envelope.(XMLNSC.NamespaceDecl)xmlns:soapenv = soapenv;
+		SET Environment.XMLNSC.soapenv:Envelope.ns1:ErrorResponse.ns1:Message =msg;
+		SET Environment.XMLNSC.soapenv:Envelope.ns1:ErrorResponse.ns1:ErrorCode= errorCode;
+		SET Environment.XMLNSC.soapenv:Envelope.ns1:ErrorResponse.ns1:ServiceName = ApplicationLabel;
+		DECLARE domainDataRef REFERENCE TO Environment.XMLNSC;
+		SET Environment.Variables.resMsg = getPayLoad(domainName,domainDataRef,InputRoot.Properties.Encoding,InputRoot.Properties.CodedCharSetId);
+
+		PROPAGATE TO TERMINAL 'out';
+	ELSE IF domainName = 'XMLNSC' THEN
+
+		SET Environment.XMLNSC = NULL;
+		CREATE LASTCHILD OF Environment DOMAIN ('XMLNSC');
+		CREATE LASTCHILD OF Environment.XMLNSC NAME 'HTTPRouterResponse';
+		CREATE LASTCHILD OF Environment.XMLNSC.* NAME 'header';
+		CREATE LASTCHILD OF Environment.XMLNSC.* NAME 'error';
+		DECLARE headref REFERENCE TO Environment.XMLNSC.*.header;
+		DECLARE errorref REFERENCE TO Environment.XMLNSC.*.error;
+		SET headref = Environment.MQRFHT2.header;
+		SET headref.status = 'FAILED';
+		SET headref.responseCode ='000';
+		SET errorref.source = 'ESB';
+		SET errorRef.applicationName = ApplicationLabel;
+		SET errorRef.applicationErrorCode = errorCode;
+		SET errorRef.message = msg;
+		DECLARE domainDataRef REFERENCE TO OutputRoot.XMLNSC;
+
+		SET Environment.Variables.resMsg = getPayLoad(domainName,domainDataRef,InputRoot.Properties.Encoding,InputRoot.Properties.CodedCharSetId);
+		PROPAGATE TO TERMINAL 'out';
+
+		SET OutputRoot.Properties = InputRoot.Properties;
+		SET OutputRoot.XMLNSC = Environment.XMLNSC;
+
+
+		SET OutputLocalEnvironment.Destination.HTTP.RequestIdentifier = CAST(Environment.MQRFH2.RequestIdentifier AS BLOB);
+		PROPAGATE TO TERMINAL 'out1';
+	END IF;
+
+
+END IF;
+END IF;
+
+
+END;
+END MODULE;
