@@ -1,0 +1,99 @@
+
+
+CREATE COMPUTE MODULE MF_Loop_Compute
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		-- CALL CopyMessageHeaders();
+	    -- CALL CopyEntireMessage();
+		 --CALL CopyEntireMessageFirst();
+		-- CALL CopyEntireMessageSecondEND();
+	   --  CALL  CopyEntireMessageThird();
+	       CALL CopyEntireMessageFOURTH();
+		RETURN TRUE;
+	END;
+
+	
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+   DECLARE i INTEGER 1;
+   FOR source AS InputRoot.JSON.Data.Data.ResultData.MessageArrayTest.Item[] DO
+     CREATE LASTCHILD OF OutputRoot.XMLNSC.Data.ResultData.MessageArrayTest.Folder[i]   NAME 'FieldA' VALUE  source.Folder.FieldA ;
+
+      CREATE LASTCHILD OF OutputRoot.XMLNSC.Data.ResultData.MessageArrayTest.Folder[i]  NAME 'FieldB' VALUE  source.Folder.FieldB ;
+     SET i = i + 1;
+    END FOR;
+	END;
+	
+	CREATE PROCEDURE CopyEntireMessageFirst ( )
+	BEGIN
+		DECLARE i INTEGER 1;
+        FOR source AS InputRoot.JSON.Data.Data.Employee.Item.Item[] DO
+     CREATE LASTCHILD OF OutputRoot.XMLNSC.Data.Employee.Item[i]   NAME 'Name' VALUE  source.Name ;
+     SET i = i + 1;
+    END FOR;
+	END;
+	
+	CREATE PROCEDURE CopyEntireMessageSecondEND()
+	BEGIN
+		
+		DECLARE Inref REFERENCE TO InputRoot.JSON.Data.EmployeeData.Details.Item[1];
+		DECLARE i INTEGER 1;
+		
+		WHILE LASTMOVE (Inref)=TRUE  DO
+			
+			CREATE LASTCHILD OF OutputRoot.XMLNSC.EmployeeData.Details[i].FirstName  VALUE Inref.FirstName;
+			CREATE LASTCHILD OF OutputRoot.XMLNSC.EmployeeData.Details[i].Address  VALUE Inref.Address;
+			
+			SET i = i+1;
+			MOVE Inref NEXTSIBLING;
+		
+			
+		END WHILE;
+		END;
+		CREATE PROCEDURE CopyEntireMessageThird() BEGIN
+			
+			DECLARE InRef REFERENCE TO InputRoot.JSON.Data.data.Item[1];
+			DECLARE InRef2 REFERENCE TO InputRoot.JSON.Data.included.Item[1];
+			
+			SET OutputRoot.XMLNSC.Response.data[1].type = InRef.type;
+			SET OutputRoot.XMLNSC.Response.data[1].id = InRef.id;
+			SET OutputRoot.XMLNSC.Response.data[1].attributes.title = InRef.attributes.title;
+			SET OutputRoot.XMLNSC.Response.data[1].attributes.body = InRef.attributes.Body;
+			SET OutputRoot.XMLNSC.Response.data[1].attributes.updated = InRef.attributes.updated;
+			
+			SET OutputRoot.XMLNSC.Response.data[1].relationships.author.data.id = InRef.relationships.author.data.id;
+			SET OutputRoot.XMLNSC.Response.data[1].relationships.author.data.id = InRef.relationships.author.data.type;
+			
+			SET OutputRoot.XMLNSC.Response.included[1].type = InRef2.type;
+			SET OutputRoot.XMLNSC.Response.included[1].id =   InRef2.id;
+			SET OutputRoot.XMLNSC.Response.included[1].attributes.name = InRef2.attributes.name;
+			SET OutputRoot.XMLNSC.Response.included[1].attributes.age = InRef2.attributes.age;
+			SET OutputRoot.XMLNSC.Response.included[1].attributes.gender = InRef2.attributes.gender;
+			
+			
+			
+	END ;
+	
+	           CREATE PROCEDURE CopyEntireMessageFOURTH ( )
+	             BEGIN
+	           DECLARE ref REFERENCE TO InputRoot.XMLNSC.breakfast_menu;
+		DECLARE ref2 REFERENCE TO InputRoot.XMLNSC.breakfast_menu.food;
+		--DECLARE outRef REFERENCE TO OutputRoot.XMLNSC.breakfast_menu;
+		DECLARE i INTEGER 1;
+		
+		--CREATE LASTCHILD OF OutputRoot DOMAIN 'JSON';
+		
+		CREATE FIELD OutputRoot.JSON.Data.breakfast_menu.food IDENTITY(JSON.Array)food;
+				
+		WHILE LASTMOVE(ref2) DO
+			CREATE LASTCHILD OF OutputRoot.JSON.Data.breakfast_menu.food.Item[i] NAME 'name' VALUE ref.food[i].name;
+			CREATE LASTCHILD OF OutputRoot.JSON.Data.breakfast_menu.food.Item[i] NAME'price' VALUE ref.food[i].price;
+			CREATE LASTCHILD OF OutputRoot.JSON.Data.breakfast_menu.food.Item[i] NAME 'description' VALUE ref.food[i].description;
+			CREATE LASTCHILD OF OutputRoot.JSON.Data.breakfast_menu.food.Item[i] NAME 'calories' VALUE ref.food[i].calories;
+			
+			SET i = i+1;
+			MOVE ref2 NEXTSIBLING;
+		END WHILE;		
+		
+	END;
+END MODULE;
