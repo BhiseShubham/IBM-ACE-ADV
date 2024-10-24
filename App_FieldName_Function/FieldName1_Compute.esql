@@ -1,0 +1,176 @@
+CREATE COMPUTE MODULE FieldName1_Compute
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		-- CALL CopyMessageHeaders();
+		CALL CopyEntireMessage();
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		/*
+		TASK Input:Use FieldName Function to check functions and convert it into json.
+		<Root>
+		<Order>
+		<OrderID>12345</OrderID>
+		<Customer>
+		<CustomerID>54321</CustomerID>
+		<Name>John Doe</Name>
+		<Address>
+		<Street>Main St</Street>
+		<City>Anytown</City>
+		<State>CA</State>
+		<Zip>12345</Zip>
+		</Address>
+		</Customer>
+		<Items>
+		<Item>
+		<ProductID>001</ProductID>
+		<ProductName>Widget</ProductName>
+		<Quantity>10</Quantity>
+		<Price>19.99</Price>
+		</Item>
+		<Item>
+		<ProductID>002</ProductID>
+		<ProductName>Gadget</ProductName>
+		<Quantity>5</Quantity>
+		<Price>29.99</Price>
+		</Item>
+		</Items>
+		</Order>
+		<Payment>
+		<Method>Credit Card</Method>
+		<Amount>299.85</Amount>
+		</Payment>
+		</Root>
+		*/
+
+		DECLARE inref REFERENCE TO InputRoot.XMLNSC.Root;
+		CREATE FIELD OutputRoot.JSON.Data.Root;
+		DECLARE Outref REFERENCE TO OutputRoot.JSON.Data.Root;
+		DECLARE itemRef REFERENCE TO InputRoot.XMLNSC.Root.Order.Items.Item[1];
+		DECLARE i INTEGER 1;
+		-- Initialize error message
+		SET Outref.Error = '';
+		-- Check order details
+		IF FIELDNAME(inref.Order) IS NOT NULL THEN
+			IF FIELDNAME(inref.Order.OrderID) IS NOT NULL THEN
+				SET Outref.Order.OrderID = inref.Order.OrderID;
+			ELSE
+				SET Outref.Error = 'Order ID is missing. ';
+			END IF;
+			-- Check customer details
+			IF FIELDNAME(inref.Order.Customer) IS NOT NULL THEN
+				-- Check customer ID
+				IF FIELDNAME(inref.Order.Customer.CustomerID) IS NOT NULL THEN
+					SET Outref.Order.Customer.CustomerID = inref.Order.Customer.CustomerID;
+				ELSE
+					SET Outref.Error = Outref.Error || 'Customer ID missing. ';
+				END IF;
+				-- Check customer Name
+				IF FIELDNAME(inref.Order.Customer.Name) IS NOT NULL THEN
+					SET Outref.Order.Customer.Name = inref.Order.Customer.Name;
+				ELSE
+					SET Outref.Error = Outref.Error || 'Customer Name missing. ';
+				END IF;
+				-- Check address details
+				IF FIELDNAME(inref.Order.Customer.Address) IS NOT NULL THEN
+					-- Check street
+					IF FIELDNAME(inref.Order.Customer.Address.Street) IS NOT NULL THEN
+						SET Outref.Order.Customer.Address.Street = inref.Order.Customer.Address.Street;
+					ELSE
+						SET Outref.Error = Outref.Error || 'Street details missing in address. ';
+					END IF;
+					-- Check city
+					IF FIELDNAME(inref.Order.Customer.Address.City) IS NOT NULL THEN
+						SET Outref.Order.Customer.Address.City = inref.Order.Customer.Address.City;
+					ELSE
+						SET Outref.Error = Outref.Error || 'City details missing in address. ';
+					END IF;
+					-- Check state
+					IF FIELDNAME(inref.Order.Customer.Address.State) IS NOT NULL THEN
+						SET Outref.Order.Customer.Address.State = inref.Order.Customer.Address.State;
+					ELSE
+						SET Outref.Error = Outref.Error || 'State details missing in address. ';
+					END IF;
+					-- Check zip
+					IF FIELDNAME(inref.Order.Customer.Address.Zip) IS NOT NULL THEN
+						SET Outref.Order.Customer.Address.Zip = inref.Order.Customer.Address.Zip;
+					ELSE
+						SET Outref.Error = Outref.Error || 'Zip details missing in address. ';
+					END IF;
+				ELSE
+					SET Outref.Error = Outref.Error || 'Address missing. ';
+				END IF;
+
+			ELSE
+				SET Outref.Error = Outref.Error || 'Customer Information missing. ';
+			END IF;
+			-- Check Items
+			IF FIELDNAME(inref.Order.Items) IS NOT NULL THEN
+				-- Check each item details
+				WHILE LASTMOVE(itemRef) DO
+					-- Check product id
+					IF FIELDNAME(itemRef.ProductID) IS NOT NULL THEN
+						SET Outref.Order.Items.Item[i].ProductID = itemRef.ProductID;
+					ELSE
+						SET Outref.Error = Outref.Error || 'Product ID missing for item ' || CAST(i AS CHAR) || '. ';
+					END IF;
+					-- Check product name
+					IF FIELDNAME(itemRef.ProductName) IS NOT NULL THEN
+						SET Outref.Order.Items.Item[i].ProductName = itemRef.ProductName;
+					ELSE
+						SET Outref.Error = Outref.Error || 'Product Name missing for item ' || CAST(i AS CHAR) || '. ';
+					END IF;
+					-- Check quantity
+					IF FIELDNAME(itemRef.Quantity) IS NOT NULL THEN
+						SET Outref.Order.Items.Item[i].Quantity = itemRef.Quantity;
+					ELSE
+						SET Outref.Error = Outref.Error || 'Quantity missing for item ' || CAST(i AS CHAR) || '. ';
+					END IF;
+					-- Check price
+					IF FIELDNAME(itemRef.Price) IS NOT NULL THEN
+						SET Outref.Order.Items.Item[i].Price = itemRef.Price;
+					ELSE
+						SET Outref.Error = Outref.Error || 'Price missing for item ' || CAST(i AS CHAR) || '. ';
+					END IF;
+
+					SET i = i + 1;
+					move itemRef NEXTSIBLING;
+				END WHILE;
+			ELSE
+				SET Outref.Error = Outref.Error || 'Items missing. ';
+			END IF;
+
+		ELSE
+			SET Outref.Error = Outref.Error || 'Order Details missing. ';
+		END IF;
+		-- check payment details
+		IF FIELDNAME(inref.Root.Payment) IS NOT NULL THEN
+			-- check payment method
+			IF FIELDNAME(inref.Root.Payment.Method) IS NOT NULL THEN
+				SET Outref.Payment.Method = inref.Payment.Method;
+			ELSE
+				SET Outref.Error = Outref.Error || 'Payment method missing';
+			END IF;
+			-- check payment amount
+			IF FIELDNAME(inref.Root.Payment.Amount) IS NOT NULL THEN
+				SET Outref.Payment.Amount = inref.Payment.Amount;
+			ELSE
+				SET Outref.Error = Outref.Error || 'Payment Amount missing';
+			END IF;
+		ELSE
+			SET Outref.Error = Outref.Error || 'Payment details missing.';
+		END IF;
+
+	END;
+END MODULE;
