@@ -1,0 +1,40 @@
+BROKER SCHEMA Com.common.esql
+
+
+
+	
+	CREATE PROCEDURE  ADD(IN X INTEGER, IN Y INTEGER, OUT C INTEGER ) 
+	BEGIN
+		SET C =  X+Y;
+	END;
+
+	CREATE FUNCTION  getPayLoad(IN domainName CHARACTER,IN domainDataRef REFERENCE, IN encodeRef INTEGER,IN ccidRef INTEGER ) RETURNS CHARACTER
+	BEGIN
+		DECLARE payload CHARACTER '';
+		
+		CASE 
+			
+		WHEN  domainName = 'XMLNSC' THEN
+			
+			SET payload = CAST (ASBITSTREAM(domainDataRef CCSID ccidRef ENCODING encodeRef ) AS CHARACTER CCSID ccidRef ENCODING encodeRef );
+			
+		WHEN  domainName = 'SOAP' THEN	
+			
+			SET payload = CAST (ASBITSTREAM (domainDataRef CCSID ccidRef ENCODING encodeRef) AS CHARACTER CCSID ccidRef ENCODING encodeRef);
+			
+		WHEN domainName = 'BLOB' THEN 
+			
+			SET payload =CAST (ASBITSTREAM (domainDataRef CCSID ccidRef ENCODING encodeRef) AS CHARACTER CCSID ccidRef ENCODING encodeRef);
+			
+		WHEN domainName = 'JSON' THEN
+			
+			SET payload = CAST (ASBITSTREAM (domainDataRef CCSID ccidRef ENCODING encodeRef ) AS CHARACTER CCSID ccidRef ENCODING encodeRef);
+			
+		END CASE;
+		RETURN payload;
+			
+		
+	
+	END;
+
+
