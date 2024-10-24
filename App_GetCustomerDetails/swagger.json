@@ -1,0 +1,87 @@
+{
+  "swagger" : "2.0",
+  "info" : {
+    "title" : "App_GetCustomerDetails",
+    "version" : "1.0.0",
+    "description" : "App_GetCustomerDetails"
+  },
+  "paths" : {
+    "/GetCustomerDetails" : {
+      "post" : {
+        "operationId" : "postGetCustomerDetails",
+        "responses" : {
+          "200" : {
+            "description" : "The operation was successful.",
+            "schema" : {
+              "$ref" : "#/definitions/CustomerDetails"
+            }
+          }
+        },
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "description" : "Insert a GetCustomerDetails",
+        "parameters" : [ {
+          "name" : "body",
+          "in" : "body",
+          "schema" : {
+            "$ref" : "#/definitions/CustomerInfo"
+          },
+          "description" : "The request body for the operation",
+          "required" : true
+        } ]
+      }
+    }
+  },
+  "basePath" : "/app_getcustomerdetails/v1",
+  "definitions" : {
+    "CustomerDetails" : {
+      "type" : "object",
+      "properties" : {
+        "CUSTOMERID" : {
+          "type" : "string"
+        },
+        "FIRSTNAME" : {
+          "type" : "string"
+        },
+        "LASTNAME" : {
+          "type" : "string"
+        },
+        "DATEOFBIRTH" : {
+          "type" : "string"
+        },
+        "EMAIL" : {
+          "type" : "string"
+        },
+        "PHONENUMBER" : {
+          "type" : "integer"
+        },
+        "ADDRESSLINE1" : {
+          "type" : "string"
+        },
+        "CITY" : {
+          "type" : "string"
+        },
+        "STATE" : {
+          "type" : "string"
+        },
+        "COUNTRY" : {
+          "type" : "string"
+        },
+        "ACCOUNTCREATIONDATE" : {
+          "type" : "string"
+        },
+        "LASTUPDATED" : {
+          "type" : "string"
+        }
+      }
+    },
+    "CustomerInfo" : {
+      "type" : "object",
+      "properties" : {
+        "CustomerID" : {
+          "type" : "integer"
+        }
+      }
+    }
+  }
+}

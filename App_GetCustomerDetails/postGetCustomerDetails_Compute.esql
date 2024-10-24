@@ -1,0 +1,70 @@
+
+
+
+DECLARE dbRetrive ROW;
+CREATE COMPUTE MODULE postGetCustomerDetails_Compute
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		-- CALL CopyMessageHeaders();
+
+		CALL CopyEntireMessage();
+		RETURN TRUE;
+	END;
+
+
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		DECLARE inRef REFERENCE TO InputRoot.JSON.Data.CustomerInfo;
+	DECLARE query CHARACTER 'SELECT * FROM Customer WHERE CustomerID=?';
+	SET Environment.Details[] = PASSTHRU(query VALUES(inRef.customerId));
+	DECLARE Field1Exists BOOLEAN EXISTS(Environment.Details[]);
+	IF Field1Exists IS TRUE THEN
+		SET OutputRoot.JSON.Data.CustomerDetails = PASSTHRU(query VALUES(inRef.customerId));
+		
+		
+	ELSEIF FIELDVALUE(OutputRoot.JSON.Data.CustomerDetails.FIRSTNAME) IS NULL THEN
+		SET OutputRoot.JSON.Data.CustomerId = 'Invalid Id.....';
+	END IF;
+	
+--		IF OutputRoot.JSON.Data.CustomerDetails.FIRSTNAME IS NULL THEN
+--		
+--		SET OutputRoot.JSON.Data.CustomerId ='Please enter the valid customer ID';
+--		
+--	
+--		
+--	END IF;
+	/*DECLARE inRef REFERENCE TO InputRoot.JSON.Data.CustomerInfo;
+	DECLARE query CHARACTER 'SELECT * FROM Customer WHERE CustomerID=?';
+	SET Environment.Details[] = PASSTHRU(query VALUES(inRef.customerId));
+	DECLARE Field1Exists BOOLEAN EXISTS(Environment.Details[]);
+	IF Field1Exists IS TRUE THEN
+		SET OutputRoot.JSON.Data.Customers = PASSTHRU(query VALUES(inRef.customerId));
+		
+		
+	ELSE
+		SET OutputRoot.JSON.Data.CustomerId = 'Invalid Id.....';
+	END IF;
+	
+		IF OutputRoot.JSON.Data.Customers.FIRSTNAME IS NULL THEN
+		
+		SET OutputRoot.JSON.Data.CustomerId ='Please enter the valid customer ID';
+		*/
+	
+	/*DECLARE sat CHARACTER 'SELECT * from EMPLOYEES';
+	DECLARE r ROW ;
+	SET r.result[] = PASSTHRU(sat);
+	-- SET OutputRoot.JSON.Data = r;
+	DECLARE ref REFERENCE TO r.result[1];
+	CREATE FIELD OutputRoot.JSON.Data.array IDENTITY(JSON.Array)array;
+	DECLARE i INTEGER 1;
+	--CREATE LASTCHILD OutputRoot.XMLNSC as ref2;
+	WHILE LASTMOVE(ref) DO
+	SET OutputRoot.JSON.Data.array.Item[i].EID = r.result[i].EID;
+	SET OutputRoot.JSON.Data.array.Item[i].ENAME = r.result[i].ENAME;
+	SET OutputRoot.JSON.Data.array.Item[i].DESIGNATION = r.result[i].DESIGNATION;
+	SET OutputRoot.JSON.Data.array.Item[i].ADDRESS = r.result[i].ADDRESS;
+	SET i = i+1;
+	MOVE ref NEXTSIBLING;
+	END WHILE;*/
+	END;
+END MODULE;
