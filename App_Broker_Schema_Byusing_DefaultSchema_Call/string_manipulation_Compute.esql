@@ -1,0 +1,26 @@
+
+
+PATH com.MyBrokerSchema;
+
+CREATE COMPUTE MODULE string_manipulation_Compute
+    CREATE FUNCTION Main() RETURNS BOOLEAN
+    BEGIN
+        CALL CopyEntireMessage();
+        RETURN TRUE;
+    END;
+
+    CREATE PROCEDURE CopyEntireMessage() 
+    BEGIN
+        DECLARE inref REFERENCE TO InputRoot.XMLNSC.Student;
+      
+		CREATE FIELD OutputRoot.XMLNSC.Students;
+        --CREATE LASTCHILD OF OutputRoot.XMLNSC domain NAME 'Students';
+        DECLARE outref REFERENCE TO OutputRoot.XMLNSC.Students;
+       
+       CALL mybroker1(inref, outref);
+	SET OutputRoot.XMLNSC.Students.res = mul(12,2);
+    END;
+ 
+END MODULE;
+
+

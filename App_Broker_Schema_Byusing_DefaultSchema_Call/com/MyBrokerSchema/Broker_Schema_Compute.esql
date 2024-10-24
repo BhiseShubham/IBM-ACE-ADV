@@ -1,0 +1,14 @@
+BROKER SCHEMA com.MyBrokerSchema
+
+	CREATE PROCEDURE mybroker1 (IN inref REFERENCE, INOUT outref REFERENCE )
+	BEGIN
+
+    
+		SET outref.Name = OVERLAY(inref.Name placing '12345' from 5); 
+	END;
+   CREATE PROCEDURE mul (in a INTEGER,in b INTEGER ) RETURNS INTEGER 
+BEGIN
+	RETURN a*b;
+	END;
+
+ 
