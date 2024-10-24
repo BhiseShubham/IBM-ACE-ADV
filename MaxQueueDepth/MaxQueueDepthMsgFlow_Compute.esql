@@ -1,0 +1,20 @@
+
+
+CREATE COMPUTE MODULE MaxQueueDepthMsgFlow_Compute
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		
+		DECLARE i INTEGER 1;
+		DECLARE j INTEGER 5000;
+		
+		WHILE i<=j DO
+			SET OutputRoot.XMLNSC.res='hi hello';
+			PROPAGATE TO TERMINAL 'out';
+			SET i=i+1;
+			
+		END WHILE;
+		
+		RETURN false;
+	END;
+
+END MODULE;
