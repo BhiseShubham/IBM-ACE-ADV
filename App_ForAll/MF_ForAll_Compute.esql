@@ -1,0 +1,45 @@
+
+
+CREATE COMPUTE MODULE MF_ForAll_Compute
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		-- CALL CopyMessageHeaders();
+		 CALL CopyEntireMessage();
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		DECLARE InRef REFERENCE TO InputRoot.XMLNSC.Invoice.Purchases;
+		DECLARE i INTEGER 1;
+		DECLARE Inref2 REFERENCE TO InputRoot.XMLNSC.Invoice.Purchases.Item;
+		IF FOR ANY InRef."Item"[] AS I (I.Quantity <= 50)  THEN
+   --		IF FOR ALL InRef."Item"[] AS I (I.Quantity <= 50)  THEN
+			
+			
+			
+			SET OutputRoot.XMLNSC.Invoice.Purchases.Item[i].Title=InRef.Item[i].Title;
+			SET OutputRoot.XMLNSC.Invoice.Purchases.Item[i].ISBN=InRef.Item[i].ISBN;
+			SET OutputRoot.XMLNSC.Invoice.Purchases.Item[i].Author=InRef.Item[i].Author;
+			SET OutputRoot.XMLNSC.Invoice.Purchases.Item[i].Publisher=InRef.Item[i].Publisher;
+			SET OutputRoot.XMLNSC.Invoice.Purchases.Item[i].PublishDate=InRef.Item[i].PublishDate;
+			SET OutputRoot.XMLNSC.Invoice.Purchases.Item[i].UnitPrice=InRef.Item[i].UnitPrice;
+			SET OutputRoot.XMLNSC.Invoice.Purchases.Item[i].Quantity=InRef.Item[i].Quantity;
+		
+		 
+		
+			
+		ELSE 
+			SET OutputRoot.XMLNSC.Result='Item value is greater than 50 Present';
+		END IF;
+	END;
+END MODULE;
