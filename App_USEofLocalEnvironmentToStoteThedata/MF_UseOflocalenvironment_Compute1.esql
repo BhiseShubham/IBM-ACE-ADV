@@ -1,0 +1,19 @@
+
+
+CREATE COMPUTE MODULE MF_UseOflocalenvironment_Compute1
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		-- CALL CopyMessageHeaders();
+		 CALL CopyEntireMessage();
+		RETURN TRUE;
+	END;
+
+
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		IF InputLocalEnvironment.Variables.OutputLocation = 'MQ' THEN
+        SET OutputLocalEnvironment.Destination.MQ.DestinationData.queueManagerName = 'myQManagerName';
+        SET OutputLocalEnvironment.Destination.MQ.DestinationData.queueName = 'myQueueName';
+END IF;
+	END;
+END MODULE;
