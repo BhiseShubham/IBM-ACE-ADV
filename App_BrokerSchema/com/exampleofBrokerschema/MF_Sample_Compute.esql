@@ -1,0 +1,27 @@
+BROKER SCHEMA com.exampleofBrokerschema
+
+PATH  Com.common.esql;
+CREATE COMPUTE MODULE MF_Sample_Compute
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		
+		 CALL CopyEntireMessage();
+		RETURN TRUE;
+	END;
+
+    /*<Result>
+    <a>5</a>
+    <b>5</b>
+</Result>*/
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		--DECLARE X,Y INTEGER;
+		
+		DECLARE  X  INTEGER InputRoot.XMLNSC.Result.a;
+		DECLARE  Y INTEGER  InputRoot.XMLNSC.Result.b;
+		DECLARE  Z INTEGER;
+		
+		CALL ADD (X,Y,Z);
+		SET OutputRoot.XMLNSC.Result = Z;
+	END;
+END MODULE;
