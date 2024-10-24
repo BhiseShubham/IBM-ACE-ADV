@@ -1,0 +1,47 @@
+
+
+CREATE COMPUTE MODULE MF_NamespaceDeclaration_Compute
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		
+		
+		
+		DECLARE sp1 NAMESPACE 'http://www.ibm.com/space1'; 
+        DECLARE sp2 NAMESPACE 'http://www.ibm.com/space2'; 
+        DECLARE sp3 NAMESPACE 'http://www.ibm.com/space3';  
+
+			-- Namespace declaration for prefix 'space1'  
+			SET OutputRoot.XMLNS.message.(XML.NamespaceDecl)xmlns:space1 = sp1;   
+			SET OutputRoot.XMLNS.message.sp1:data1 = 'Hello!';         
+			
+			-- Default namespace declaration ( empty prefix )  
+			SET OutputRoot.XMLNS.message.sp2:data2.(XML.NamespaceDecl)xmlns = 'http://www.ibm.com/space2'; 
+			SET OutputRoot.XMLNS.message.sp2:data2.sp2:subData1 = 'Hola!'; 
+			SET OutputRoot.XMLNS.message.sp2:data2.sp2:subData2 = 'Guten Tag!';  
+			SET OutputRoot.XMLNS.message.sp3:data3 = 'Bonjour!';  
+			
+			
+			
+			
+		/*	--Declaring an empty prefix
+			
+			DECLARE space1 NAMESPACE 'namespace1';
+            SET OutputRoot.XMLNSC.space1:root.(XMLNSC.NamespaceDecl)xmlns = space1;
+            SET OutputRoot.XMLNSC.space1:root.space1:example = 'ABCDE';
+			  
+			  ----*
+			  DECLARE space1 NAMESPACE 'namespace1';
+              SET OutputRoot.XMLNSC.root.(XMLNSC.NamespaceDecl)xmlns = space1;
+              SET OutputRoot.XMLNSC.root.example = 'ABCDE'; */
+              
+              
+             
+              
+              
+					RETURN TRUE;
+				END;
+
+	
+
+
+END MODULE;

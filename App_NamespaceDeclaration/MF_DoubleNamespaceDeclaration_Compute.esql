@@ -1,0 +1,25 @@
+
+
+CREATE COMPUTE MODULE MF_DoubleNamespaceDeclaration_Compute
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		
+		
+		DECLARE space1 NAMESPACE 'namespace1';
+		
+		--SET OutputRoot.(XMLNSC.DoubleNamespaceDecl)xmlns:ns2 = space1;
+		
+		
+		
+		--CREATE LASTCHILD OF OutputRoot IDENTITY (XMLNSC.DoubleNamespaceDecl)xmlns:ns2 VALUE space1;
+		
+		CREATE LASTCHILD OF OutputRoot TYPE XMLNSC.DoubleNamespaceDecl NAMESPACE 'xmlns' NAME 'ns2' VALUE space1;
+		
+		
+		RETURN TRUE;
+	END;
+
+	
+
+	
+END MODULE;
