@@ -1,0 +1,28 @@
+
+
+CREATE COMPUTE MODULE MF_Retry_Compute1
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		
+		
+			DECLARE i INTEGER 1;
+--DECLARE Inref REFERENCE TO InputRoot.XMLNSC.root;
+
+WHILE i <= 3 DO
+    -- Your processing logic here
+    -- Example: LOG or SET statements
+           SET OutputRoot  =  InputRoot;
+    -- Increment the counter
+    SET i = i + 1;
+     PROPAGATE to Terminal 'out';
+END WHILE;
+RETURN TRUE;
+		PROPAGATE to Terminal 'out1';		
+
+
+	
+	
+	
+	
+	END;
+END MODULE;
