@@ -19,8 +19,10 @@ CREATE COMPUTE MODULE MF_Aadhar_Compute
 	END;
 
 	CREATE PROCEDURE CopyEntireMessage() BEGIN
-		DECLARE inRef REFERENCE TO InputRoot.JSON.Data.AadharNo;
-		IF inRef=789456123 THEN
+		DECLARE inRef REFERENCE TO InputRoot.JSON.Data.AadharDetails.Details;
+		DECLARE AadharID INTEGER ;
+		SET AadharID = inRef.AadharNumber;
+		IF AadharID=860 OR AadharID IS NOT NULL  THEN
 			SET OutputRoot.JSON.Data.AadharDetails.Name='Shubham';
 			SET OutputRoot.JSON.Data.AadharDetails.ID=860;
 			SET OutputRoot.JSON.Data.AadharDetails.Aaddress='Bandra';

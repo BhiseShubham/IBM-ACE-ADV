@@ -6,7 +6,7 @@
     <colorGraphic16 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/App_Grouping_Task/icons/full/obj16/Pan.gif"/>
     <colorGraphic32 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/App_Grouping_Task/icons/full/obj30/Pan.gif"/>
     <composition>
-      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_1" location="281,106" computeExpression="esql://routine/#Pan_Compute.Main">
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_1" location="281,106" computeExpression="esql://routine/#Pan_Compute.Main" computeMode="destinationAndMessage">
         <translation xmi:type="utility:ConstantString" string="Compute"/>
       </nodes>
       <nodes xmi:type="ComIbmWSInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_2" location="46,109" URLSpecifier="/Pan" messageDomainProperty="JSON">

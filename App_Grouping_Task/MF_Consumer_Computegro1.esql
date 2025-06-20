@@ -23,9 +23,11 @@ CREATE COMPUTE MODULE MF_Consumer_Compute1
 		DECLARE AadharRef REFERENCE TO respRef.Aadhar.Reply.Root.JSON.Data.AadharDetails;
 		DECLARE PanRef REFERENCE TO respRef.PAN.Reply.Root.JSON.Data.PanDetails;
 		IF AadharRef.ID IS NOT NULL THEN
-		SET OutputRoot.XMLNSC.AadharDetails = AadharRef;	
-		ELSEIF PanRef.ID IS NOT NULL THEN 
-		SET OutputRoot.XMLNSC.PanDetails = PanRef;	
+			
+			CREATE FIELD OutputRoot.JSON.Data.CustomerInformation IDENTITY (JSON.Array) ;
+			
+		SET OutputRoot.JSON.Data.CustomerInformation.AadharDetails = AadharRef;	
+		SET OutputRoot.JSON.Data.CustomerInformation.PanDetails = PanRef;	
 		ELSE
 				SET OutputRoot.XMLNSC.mESSAGE='NOT FOUND';
 		END IF;

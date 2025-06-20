@@ -10,13 +10,13 @@
       <nodes xmi:type="ComIbmWSReply.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_2" location="660,218">
         <translation xmi:type="utility:ConstantString" string="HTTP Reply"/>
       </nodes>
-      <nodes xmi:type="ComIbmGroupScatter.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_3" location="176,75" GroupName="Details" GroupTimeout="30.0">
+      <nodes xmi:type="ComIbmGroupScatter.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_3" location="167,82" GroupName="Details" GroupTimeout="30.0">
         <translation xmi:type="utility:ConstantString" string="Group Scatter"/>
       </nodes>
-      <nodes xmi:type="ComIbmGroupGather.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="246,216" GroupName="Details" UnknownMessageTimeout="30.0">
+      <nodes xmi:type="ComIbmGroupGather.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="246,216" GroupName="Details" UnknownMessageTimeout="0.0">
         <translation xmi:type="utility:ConstantString" string="Group Gather"/>
       </nodes>
-      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="315,74" computeExpression="esql://routine/#MF_Consumer_Compute.Main">
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="612,48" computeExpression="esql://routine/#MF_Consumer_Compute.Main">
         <translation xmi:type="utility:ConstantString" string="Compute"/>
       </nodes>
       <nodes xmi:type="ComIbmHTTPAsyncRequest.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_6" location="433,20" asyncResponseCorrelator="Aadhar" URLSpecifier="http://localhost:7800/Aadhar" AddRequestToGroup="true" GroupRequestFolderName="Aadhar" GroupRequestTimeout="30.0">
@@ -31,28 +31,31 @@
       <nodes xmi:type="ComIbmHTTPAsyncResponse.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_9" location="48,271" asyncRequestCorrelator="Pan" messageDomainProperty="JSON">
         <translation xmi:type="utility:ConstantString" string="HTTP Async Response1"/>
       </nodes>
-      <nodes xmi:type="ComIbmGroupComplete.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_10" location="397,218" GroupName="Details">
+      <nodes xmi:type="ComIbmGroupComplete.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_10" location="402,279" GroupName="Details">
         <translation xmi:type="utility:ConstantString" string="Group Complete"/>
       </nodes>
-      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_11" location="519,215" computeExpression="esql://routine/#MF_Consumer_Compute1.Main">
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_11" location="524,276" computeExpression="esql://routine/#MF_Consumer_Compute1.Main">
         <translation xmi:type="utility:ConstantString" string="Compute1"/>
       </nodes>
       <nodes xmi:type="ComIbmWSInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_1" location="42,76" URLSpecifier="/GroupFlowConsumer" messageDomainProperty="JSON">
         <translation xmi:type="utility:ConstantString" string="HTTP Input"/>
       </nodes>
-      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_2" targetNode="FCMComposite_1_5" sourceNode="FCMComposite_1_3" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
-      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_3" targetNode="FCMComposite_1_6" sourceNode="FCMComposite_1_5" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
-      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_4" targetNode="FCMComposite_1_7" sourceNode="FCMComposite_1_5" sourceTerminalName="OutTerminal.out1" targetTerminalName="InTerminal.in"/>
       <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_5" targetNode="FCMComposite_1_4" sourceNode="FCMComposite_1_8" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
       <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_6" targetNode="FCMComposite_1_4" sourceNode="FCMComposite_1_9" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
       <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_7" targetNode="FCMComposite_1_11" sourceNode="FCMComposite_1_10" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
       <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_8" targetNode="FCMComposite_1_2" sourceNode="FCMComposite_1_11" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
       <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_1" targetNode="FCMComposite_1_3" sourceNode="FCMComposite_1_1" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_2" targetNode="FCMComposite_1_6" sourceNode="FCMComposite_1_3" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_3" targetNode="FCMComposite_1_7" sourceNode="FCMComposite_1_3" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_4" targetNode="FCMComposite_1_2" sourceNode="FCMComposite_1_4" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.in">
+        <bendPoints>204,-43,-206,-45</bendPoints>
+      </connections>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_9" targetNode="FCMComposite_1_2" sourceNode="FCMComposite_1_4" sourceTerminalName="OutTerminal.unknown" targetTerminalName="InTerminal.in"/>
     </composition>
     <propertyOrganizer/>
     <stickyBoard>
-      <stickyNote location="141,337">
-        <body xmi:type="utility:ConstantString" string="{&#xD;&#xA;    &quot;CustomerDetailsVerify&quot;: {&#xD;&#xA;        &quot;Item&quot;: {&#xD;&#xA;            &quot;Aadhar_Number_Verify&quot;: {&#xD;&#xA;                &quot;Number&quot;: &quot;789456123&quot;&#xD;&#xA;            }&#xD;&#xA;            // You can have additional items here, but only items with &quot;Aadhar_Number_Verify&quot; will be processed.&#xD;&#xA;        }&#xD;&#xA;    }&#xD;&#xA;}&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;{&#xD;&#xA;    &quot;CustomerDetailsVerify&quot;: {&#xD;&#xA;        &quot;Item&quot;: {&#xD;&#xA;            &quot;PAN_Number_Verify&quot;: {&#xD;&#xA;                &quot;Number&quot;: &quot;1ABC789&quot;&#xD;&#xA;            }&#xD;&#xA;            // You can have additional items here, but only items with &quot;Aadhar_Number_Verify&quot; will be processed.&#xD;&#xA;        }&#xD;&#xA;    }&#xD;&#xA;}"/>
+      <stickyNote location="200,291">
+        <body xmi:type="utility:ConstantString" string="{&#xD;&#xA;    &quot;AadharDetails&quot;: {&#xD;&#xA;        &quot;Details&quot;: {&#xD;&#xA;            &quot;AadharNumber&quot;: 860&#xD;&#xA;        }&#xD;&#xA;    }&#xD;&#xA;}"/>
       </stickyNote>
     </stickyBoard>
   </eClassifiers>
