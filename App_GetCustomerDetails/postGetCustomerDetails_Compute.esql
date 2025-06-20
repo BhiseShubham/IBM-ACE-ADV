@@ -15,7 +15,7 @@ CREATE COMPUTE MODULE postGetCustomerDetails_Compute
 
 	CREATE PROCEDURE CopyEntireMessage() BEGIN
 		DECLARE inRef REFERENCE TO InputRoot.JSON.Data.CustomerInfo;
-	DECLARE query CHARACTER 'SELECT * FROM Customer WHERE CustomerID=?';
+	DECLARE query CHARACTER 'SELECT * FROM customer WHERE CustomerID=?';
 	SET Environment.Details[] = PASSTHRU(query VALUES(inRef.customerId));
 	DECLARE Field1Exists BOOLEAN EXISTS(Environment.Details[]);
 	IF Field1Exists IS TRUE THEN
